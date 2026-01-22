@@ -14,7 +14,7 @@ const PORT = 4000;
 const SECRET = 'K@O$@V@';
 
 
-mongoose.connect('mongodb://localhost:27017/jwtReact')
+mongoose.connect('mongodb+srv://kanarina:admin@cluster0.ugzxsm9.mongodb.net/efi')
   .then(() => console.log('MongoDB u lidh me sukses!'))
   .catch(err => console.error(err));
 
