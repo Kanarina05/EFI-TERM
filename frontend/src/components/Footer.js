@@ -6,41 +6,41 @@ export default function Footer() {
       <div>
         <div className="logo">
           <div className="logo-bars"> 
-            <div className="bar"></div>
-            <div className="bar"></div>
-            <div className="bar"></div>
+            
           </div>
-          <h3>SiteLogo</h3>
+          <h3 className='efi'>efi TERM</h3>
         </div>
-        <p>High level experience in web design and development knowledge, producing quality work.</p>
+        <div className='teksti'> 
+<p>Ujësjellës & Ngrohje Qendrore
+Instalim • Mirëmbajtje • Servisim
+<br></br>Efi Term ofron shërbime në ujësjellës dhe ngrohje qendrore. 
+ <br></br>Qëllimi ynë është punë e pastër, e sigurt dhe e kryer me përgjegjësi.</p>
+        </div>
+        
       </div>
       <div>
-        <h3>Use Cases</h3>
+        <h3>Rreth Nesh</h3>
         <ul>
-          <li>Web-designers</li>
-          <li>Marketers</li>
-          <li>Small Business</li>
-          <li>Website Builder</li>
+          <li>Numri Kontaktues</li>
+          <li>Email</li>
+          <li>📍 Kosovë</li>
+         
         </ul>
       </div>
       <div>
-        <h3>Company</h3>
+       
         <ul>
-          <li>About Us</li>
-          <li>Careers</li>
-          <li>FAQs</li>
-          <li>Teams</li>
+          <li>+383 44574631</li>
+          <li>efi.term.01@gmail.com</li>
+          <li>📍 Lipjan</li>
         </ul>
       </div>
       <div>
-        <h3>Follow us</h3>
+        <h3>Na Ndiqni</h3>
         <div className="social-icons">
           <div className="social-icon"><FaFacebook /></div>
-          <div className="social-icon"><FaTwitter /></div>
-          <div className="social-icon"><FaGithub /></div>
           <div className="social-icon"><FaInstagram /></div>
-          <div className="social-icon"><FaLinkedin /></div>
-          <div className="social-icon"><FaBasketballBall /></div>
+          
         </div>
       </div>
     </footer>
