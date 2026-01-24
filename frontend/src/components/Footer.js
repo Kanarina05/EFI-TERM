@@ -18,7 +18,7 @@ Instalim • Mirëmbajtje • Servisim
         </div>
         
       </div>
-      <div>
+      <div className='left'>
         <h3>Rreth Nesh</h3>
         <ul>
           <li>Numri Kontaktues</li>

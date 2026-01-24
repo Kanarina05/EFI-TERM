@@ -73,7 +73,7 @@ export default function Ballina() {
         position: 'relative',
         width: '100%',
         minHeight: '90vh',
-        backgroundImage: 'url(/images/2.png)',
+        backgroundImage: 'url(/images/b.jpeg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

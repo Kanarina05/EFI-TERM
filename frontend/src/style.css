@@ -58,6 +58,9 @@ footer h3 {
   margin: 0 0 15px 0;
   font-size: 18px;
 }
+.left{
+  margin-left: 100px;
+}
 
 footer p {
   margin: 10px 0;
@@ -132,4 +135,17 @@ footer ul li {
   font-size: 35px;
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.rreth{
+  font-size: 70px;
+  font-family:'Inter', sans-serif;
+  display:flex;
+  justify-content: center;
+}
+.ff{
+  font-size: 35px;
+  display: flex;
+  font-family:'Inter', sans-serif;
+  justify-content: flex-start;
+  
 }
