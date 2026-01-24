@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const User = require('./models/User');
 const Post = require('./models/Post');
@@ -104,6 +106,51 @@ app.get('/allposts', async (req, res) => {
     res.json(posts);
   } catch (err) {
     res.status(500).json({ message: 'Gabim!' });
+  }
+});
+
+// Merr postimet e përdoruesit të loguar
+app.get('/myposts', verifyToken, async (req, res) => {
+  try {
+    const posts = await Post.find({ userId: req.user.userId })
+      .populate('userId', 'username')
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'Gabim!' });
+  }
+});
+
+// Fshi postim
+app.delete('/posts/:id', verifyToken, async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ message: 'Postimi nuk u gjet!' });
+    }
+
+    
+    if (post.userId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Nuk keni te drejte te fshini kete postim!' });
+    }
+
+    
+    if (post.image) {
+      const imagePath = path.join(__dirname, 'uploads', post.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+   
+    await Post.findByIdAndDelete(postId);
+
+    res.json({ message: 'Postimi u fshi me sukses!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Gabim gjate fshirjes se postimit!' });
   }
 });
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -12,6 +12,8 @@ export default function Ballina() {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
   const perPage = 6;
+  const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     loadPosts();
@@ -37,6 +39,31 @@ export default function Ballina() {
     const element = document.getElementById('products');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  async function deletePost(postId) {
+    if (!window.confirm('A jeni te sigurt')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/posts/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        // Fshi postimin nga lista
+        setPosts(posts.filter(post => post._id !== postId));
+      } else {
+        alert(data.message || 'Gabim gjatë fshirjes!');
+      }
+    } catch (err) {
+      alert('Gabim gjatë fshirjes!');
     }
   }
 
@@ -123,35 +150,74 @@ export default function Ballina() {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
                 gap: '25px'
           }}>
-            {currentPosts.map(post => (
-          <div key={post._id} style={{ 
-                    border: '1px solid #E5E5E5',
-                    borderRadius: '12px',
-            overflow: 'hidden',
-                    background: '#fff',
-                    transition: 'transform 0.2s',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                  >
-            {post.image && (
-              <img 
-                src={`${API}/uploads/${post.image}`} 
-                alt={post.title}
-                style={{ 
-                  width: '100%', 
-                  height: '250px',
-                  objectFit: 'cover'
+            {currentPosts.map(post => {
+              const isOwner = userId && post.userId && (post.userId._id || post.userId).toString() === userId;
+              return (
+                <div key={post._id} style={{ 
+                  border: '1px solid #E5E5E5',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  background: '#fff',
+                  transition: 'transform 0.2s',
+                  cursor: 'pointer',
+                  position: 'relative'
                 }}
-              />
-            )}
-                    <div style={{ padding: '20px' }}>
-                      <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: '#07484A' }}>{post.title}</h3>
-                      <p style={{ margin: '0', color: '#70908B', fontSize: '14px' }}>{post.text}</p>
-            </div>
-          </div>
-        ))}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  {isOwner && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deletePost(post._id);
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        background: 'rgba(255, 0, 0, 0.8)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '35px',
+                        height: '35px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10,
+                        transition: 'background 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 0, 0, 1)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 0, 0, 0.8)'}
+                      title="Fshi postimin"
+                    >
+                      <FaTrash size={14} />
+                    </button>
+                  )}
+                  {post.image && (
+                    <img 
+                      src={`${API}/uploads/${post.image}`} 
+                      alt={post.title}
+                      style={{ 
+                        width: '100%', 
+                        height: '250px',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  )}
+                  <div style={{ padding: '20px' }}>
+                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: '#07484A' }}>{post.title}</h3>
+                    <p style={{ margin: '0', color: '#70908B', fontSize: '14px' }}>{post.text}</p>
+                    {post.userId && post.userId.username && (
+                      <p style={{ margin: '10px 0 0 0', color: '#999', fontSize: '12px' }}>
+                        Nga: {post.userId.username}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {totalPages > 1 && (
