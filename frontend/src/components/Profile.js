@@ -80,10 +80,10 @@ export default function Home() {
           marginBottom: '30px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}>
-          <h2 style={{ color: '#07484A', marginBottom: '10px' }}>Miresevjen, {username}!</h2>
+          <h2 style={{ color: '#000000', marginBottom: '10px' }}>Miresevjen, {username}!</h2>
           <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
             <Link to="/shto" style={{
-              background: '#70908B',
+              background: '#000000',
               color: 'white',
               border: 'none',
               padding: '12px 24px',
@@ -111,10 +111,10 @@ export default function Home() {
           padding: '30px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}>
-          <h3 style={{ color: '#07484A', marginBottom: '20px' }}>Postimet e Mia</h3>
+          <h3 style={{ color: '#000000', marginBottom: '20px' }}>Postimet e Mia</h3>
           
           {loading ? (
-            <p style={{ color: '#07484A' }}>Duke ngarkuar...</p>
+            <p style={{ color: '#000000' }}>Duke ngarkuar...</p>
           ) : posts.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px' }}>
               <p style={{ color: '#70908B', marginBottom: '20px' }}>Nuk keni postime akoma.</p>

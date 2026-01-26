@@ -44,7 +44,8 @@ export default function Header({ textColor = '#07484A', onProductsClick }) {
           {isLoggedIn && <Link to="/shto" style={{ color: textColor, textDecoration: 'none' }}>Shto Produkt</Link>}
           <Link to="/" style={{ color: textColor, textDecoration: 'none' }}>Categories</Link>
           <Link to="/about" style={{ color: textColor, textDecoration: 'none' }}>About</Link>
-          <Link to="/" style={{ color: textColor, textDecoration: 'none' }}>Contact Us</Link>
+          <Link to="/contact" style={{ color: textColor, textDecoration: 'none' }}>Contact</Link>
+           <Link to="/kategori" style={{ color: textColor, textDecoration: 'none' }}>Kategori</Link>
         </nav>
         <div style={{ display: 'flex', gap: '20px', color: textColor, fontSize: '20px', alignItems: 'center' }}>
           <FaShoppingCart style={{ cursor: 'pointer', color: textColor }} />

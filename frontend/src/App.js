@@ -5,6 +5,9 @@ import Home from './components/Profile';
 import Ballina from './components/Ballina';
 import ShtoProdukt from './components/ShtoProdukt';
 import About from './components/About';
+import Contact from './components/Contact';
+import Kategori from './components/Kategori';
+
 import './style.css';
 
 export default function App() {
@@ -17,6 +20,12 @@ export default function App() {
         <Route path="/shto" element={<ShtoProdukt />} />
         <Route path="/" element={<Ballina />} />
         <Route path="/about" element={<About />} />
+         <Route path="/contact" element={<Contact />} />
+         <Route path="/kategori" element={<Kategori />} />
+
+      
+
+         
       </Routes>
     </BrowserRouter>
   );

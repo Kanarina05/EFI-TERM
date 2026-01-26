@@ -10,8 +10,8 @@ export default function Footer() {
           </div>
           <h3 className='efi'>efi TERM</h3>
         </div>
-        <div className='teksti'> 
-<p>Ujësjellës & Ngrohje Qendrore
+        <div> 
+<p className='t1'>Ujësjellës & Ngrohje Qendrore <br></br>
 Instalim • Mirëmbajtje • Servisim
 <br></br>Efi Term ofron shërbime në ujësjellës dhe ngrohje qendrore. 
  <br></br>Qëllimi ynë është punë e pastër, e sigurt dhe e kryer me përgjegjësi.</p>

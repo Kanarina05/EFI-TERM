@@ -84,23 +84,11 @@ export default function Ballina() {
             padding: '80px 0',
             maxWidth: '45%'
           }}>
-            <h1 style={{ fontSize: '48px', color: 'white', marginBottom: '20px', fontWeight: 'bold', lineHeight: '1.2' }}>
-              Exclusive Deals of Furniture Collection
-            </h1>
-            <p style={{ fontSize: '18px', color: 'white', marginBottom: '30px' }}>
-              Explore different categories. Find the best deals.
-            </p>
-            <button style={{
-              background: '#70908B',
-              color: 'white',
-              border: 'none',
-              padding: '15px 40px',
-              borderRadius: '6px',
-              fontSize: '16px',
-              cursor: 'pointer'
-            }}>
-              Shop Now
-            </button>
+           <header className="header-title">
+  <h1>Efi Term</h1>
+  <p>Ujësjellës | Ngrohje Qendrore | Sisteme Vakumi | </p>
+</header>
+           
           </div>
         </div>
       </div>
