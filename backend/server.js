@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -12,19 +13,16 @@ const Post = require('./models/Post');
 const verifyToken = require('./middleware/verifyToken');
 
 const app = express();
-const PORT = 4000;
-const SECRET = 'K@O$@V@';
+const PORT = process.env.PORT || 4000;
+const SECRET = process.env.JWT_SECRET;
 
-
-mongoose.connect('mongodb+srv://kanarina:admin@cluster0.ugzxsm9.mongodb.net/efi')
+mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log('MongoDB u lidh me sukses!'))
   .catch(err => console.error(err));
-
 
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
@@ -32,46 +30,34 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-
 app.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: 'te gjithe fuhsat duhet te plotesohen!' });
-    }
+    if (!username || !email || !password)
+      return res.status(400).json({ message: 'Te gjitha fushat duhet te plotesohen!' });
 
     const exists = await User.findOne({ email });
-    if (exists) {
-      return res.status(400).json({ message: 'ky email ekziston!' });
-    }
+    if (exists)
+      return res.status(400).json({ message: 'Ky email ekziston!' });
 
     const hashed = await bcrypt.hash(password, 10);
     await new User({ username, email, password: hashed }).save();
-
     res.status(201).json({ message: 'Regjistrimi u krye me sukses!' });
   } catch (err) {
     res.status(500).json({ message: 'Gabim gjate regjistrimit!' });
   }
 });
 
-
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'te dhenat gabim!' });
+    if (!user) return res.status(401).json({ message: 'Te dhenat gabim!' });
 
     const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(401).json({ message: 'te dhenat gabim' });
+    if (!ok) return res.status(401).json({ message: 'Te dhenat gabim!' });
 
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      SECRET,
-      { expiresIn: '24h' }
-    );
-
+    const token = jwt.sign({ userId: user._id, email: user.email }, SECRET, { expiresIn: '24h' });
     res.json({ token, userId: user._id });
   } catch (err) {
     res.status(500).json({ message: 'Gabim gjate loginit!' });
@@ -82,79 +68,50 @@ app.post('/posts', verifyToken, upload.single('image'), async (req, res) => {
   try {
     const { title, text } = req.body;
     const image = req.file ? req.file.filename : null;
-
-    const post = await new Post({
-      userId: req.user.userId,
-      title,
-      text,
-      image
-    }).save();
-
+    const post = await new Post({ userId: req.user.userId, title, text, image }).save();
     res.status(201).json(post);
   } catch (err) {
-    res.status(500).json({ message: 'Gabim gjate procesit te postimit' });
+    res.status(500).json({ message: 'Gabim gjate procesit te postimit!' });
   }
 });
 
-
 app.get('/allposts', async (req, res) => {
   try {
-    const posts = await Post.find()
-      .populate('userId', 'username')
-      .sort({ createdAt: -1 });
-
+    const posts = await Post.find().populate('userId', 'username').sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {
     res.status(500).json({ message: 'Gabim!' });
   }
 });
 
-// Merr postimet e përdoruesit të loguar
 app.get('/myposts', verifyToken, async (req, res) => {
   try {
     const posts = await Post.find({ userId: req.user.userId })
       .populate('userId', 'username')
       .sort({ createdAt: -1 });
-
     res.json(posts);
   } catch (err) {
     res.status(500).json({ message: 'Gabim!' });
   }
 });
 
-// Fshi postim
 app.delete('/posts/:id', verifyToken, async (req, res) => {
   try {
-    const postId = req.params.id;
-    const post = await Post.findById(postId);
-
-    if (!post) {
-      return res.status(404).json({ message: 'Postimi nuk u gjet!' });
-    }
-
-    
-    if (post.userId.toString() !== req.user.userId) {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Postimi nuk u gjet!' });
+    if (post.userId.toString() !== req.user.userId)
       return res.status(403).json({ message: 'Nuk keni te drejte te fshini kete postim!' });
-    }
 
-    
     if (post.image) {
-      const imagePath = path.join(__dirname, 'uploads', post.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
+      const imgPath = path.join(__dirname, 'uploads', post.image);
+      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
     }
 
-   
-    await Post.findByIdAndDelete(postId);
-
+    await Post.findByIdAndDelete(req.params.id);
     res.json({ message: 'Postimi u fshi me sukses!' });
   } catch (err) {
-    res.status(500).json({ message: 'Gabim gjate fshirjes se postimit!' });
+    res.status(500).json({ message: 'Gabim gjate fshirjes!' });
   }
 });
 
-
-app.listen(PORT, () =>
-  console.log(`Serveri po punon ne portin ${PORT}`)
-);
+app.listen(PORT, () => console.log(`Serveri po punon ne portin ${PORT}`));

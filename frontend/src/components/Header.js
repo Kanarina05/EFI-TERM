@@ -1,58 +1,55 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
 
-export default function Header({ textColor = '#07484A', onProductsClick }) {
+export default function Header({ textColor = '#07484A', onScrollTo }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    const checkLogin = () => {
-      const token = localStorage.getItem('token');
-      setIsLoggedIn(!!token);
-    };
-    checkLogin();
-    const interval = setInterval(checkLogin, 100);
-    return () => clearInterval(interval);
+    const check = () => setIsLoggedIn(!!localStorage.getItem('token'));
+    check();
+    const id = setInterval(check, 500);
+    return () => clearInterval(id);
   }, []);
 
-  function scrollToProducts() {
-    if (onProductsClick) {
-      onProductsClick();
+  function handleNav(e, sectionId) {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      if (onScrollTo) onScrollTo(sectionId);
+      else document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      const element = document.getElementById('products');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
+      window.location.href = `/#${sectionId}`;
     }
   }
 
+  const link = { color: textColor, textDecoration: 'none', fontSize: '15px', fontWeight: 500 };
+
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px 40px' }}>
-      <header style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '20px 0',
-        background: 'transparent'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <image />
-        </div>
-        <nav style={{ display: 'flex', gap: '30px', color: textColor }}>
-          <Link to="/" style={{ color: textColor, textDecoration: 'none', borderBottom: textColor === 'white' ? '2px solid white' : 'none', paddingBottom: textColor === 'white' ? '5px' : '0' }}>Home</Link>
-          <a href="#products" onClick={(e) => { e.preventDefault(); scrollToProducts(); }} style={{ color: textColor, textDecoration: 'none', cursor: 'pointer' }}>Products</a>
-          {isLoggedIn && <Link to="/shto" style={{ color: textColor, textDecoration: 'none' }}>Shto Produkt</Link>}
-          <Link to="/" style={{ color: textColor, textDecoration: 'none' }}>Categories</Link>
-          <Link to="/about" style={{ color: textColor, textDecoration: 'none' }}>About</Link>
-          <Link to="/contact" style={{ color: textColor, textDecoration: 'none' }}>Contact</Link>
-           <Link to="/kategori" style={{ color: textColor, textDecoration: 'none' }}>Kategori</Link>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 40px' }}>
+      <header style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', padding: '22px 0' }}>
+
+        <Link to="/" style={{ ...link, fontSize: '20px', fontWeight: 800, letterSpacing: '-0.5px' }}>
+          Efi Term
+        </Link>
+
+        <nav style={{ display: 'flex', gap: '32px', alignItems: 'center', justifyContent: 'center' }}>
+          <Link to="/" style={link}>Kryefaqja</Link>
+          <a href="/#about"    onClick={e => handleNav(e, 'about')}    style={link}>Rreth Nesh</a>
+          <a href="/#services" onClick={e => handleNav(e, 'services')} style={link}>Shërbimet</a>
+          <a href="/#products" onClick={e => handleNav(e, 'products')} style={link}>Produktet</a>
+          {isLoggedIn && <Link to="/shto" style={link}>Shto Produkt</Link>}
+          <Link to="/contact"  style={link}>Kontakti</Link>
         </nav>
-        <div style={{ display: 'flex', gap: '20px', color: textColor, fontSize: '20px', alignItems: 'center' }}>
-          <FaShoppingCart style={{ cursor: 'pointer', color: textColor }} />
-          <Link to={isLoggedIn ? "/home" : "/login"} style={{ color: textColor }}><FaUser style={{ cursor: 'pointer', color: textColor }} /></Link>
+
+        <div style={{ display: 'flex', gap: '18px', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <FaShoppingCart style={{ cursor: 'pointer', color: textColor, fontSize: '18px' }} />
+          <Link to={isLoggedIn ? '/home' : '/login'} style={{ color: textColor }}>
+            <FaUser style={{ cursor: 'pointer', fontSize: '18px' }} />
+          </Link>
         </div>
+
       </header>
     </div>
   );
 }
-

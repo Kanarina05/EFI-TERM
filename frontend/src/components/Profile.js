@@ -29,7 +29,7 @@ export default function Home() {
         }
       });
       const data = await res.json();
-      setPosts(data || []);
+      setPosts(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (err) {
       setLoading(false);

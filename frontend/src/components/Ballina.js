@@ -1,268 +1,275 @@
 import { useEffect, useState } from 'react';
-import { FaSearch, FaTrash } from 'react-icons/fa';
+import { FaSearch, FaTrash, FaFire, FaTint, FaWind, FaTools,
+         FaBullseye, FaEye, FaHandshake,
+         FaCheckCircle, FaShieldAlt, FaClock, FaLeaf } from 'react-icons/fa';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination, EffectFade, Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+import 'swiper/css/effect-fade';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+
 const API = 'http://localhost:4000';
 
-export default function Ballina() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const navigate = useNavigate();
-  const perPage = 6;
-  const userId = localStorage.getItem('userId');
-  const token = localStorage.getItem('token');
+const slides = [
+  { bg: '/images/b.jpeg',      badge: 'Kompania Nr.1 në Kosovë',   title: 'Efi Term',          sub: 'Ngrohje Qendrore · Ujësjellës · Sisteme Vakumi', cta: 'Zbulo Shërbimet', href: '#services' },
+  { bg: '/images/10.jpeg',     badge: 'Cilësi e Garantuar',        title: 'Projektet Tona',    sub: 'Çdo instalim është dëshmi e profesionalizmit tonë', cta: 'Shiko Produktet', href: '#products' },
+  { bg: '/images/slider1.jpg', badge: 'Zgjidhje Rezidenciale',     title: 'Shtëpia Juaj',      sub: 'Sisteme moderne ngrohjeje për çdo lloj objekti', cta: 'Na Kontaktoni', href: '/contact' },
+  { bg: '/images/slider2.jpg', badge: 'Instalime Komerciale',      title: 'Ndërtesa Moderne',  sub: 'Infrastrukturë energjetike efikase dhe e besueshme', cta: 'Merr Ofertë', href: '/contact' },
+];
 
-  useEffect(() => {
-    loadPosts();
-  }, []);
+const stats = [
+  { number: '10+',  label: 'Vjet Eksperiencë' },
+  { number: '500+', label: 'Projekte të Kryera' },
+  { number: '300+', label: 'Klientë të Kënaqur' },
+  { number: '24/7', label: 'Mbështetje Teknike' },
+];
+
+const whyUs = [
+  { icon: <FaCheckCircle />, text: 'Ekip i certifikuar dhe me eksperiencë' },
+  { icon: <FaShieldAlt />,   text: 'Garanci e plotë për çdo instalim' },
+  { icon: <FaClock />,       text: 'Afate të respektuara gjithmonë' },
+  { icon: <FaLeaf />,        text: 'Zgjidhje efikase energjetike' },
+];
+
+const values = [
+  { icon: <FaBullseye />,  title: 'Misioni', desc: 'Të ofrojmë komoditet maksimal dhe kursim energjie për çdo klient.' },
+  { icon: <FaEye />,       title: 'Vizioni', desc: 'Të jemi lider në tregun e zgjidhjeve termike me teknologji të avancuar.' },
+  { icon: <FaHandshake />, title: 'Vlerat',  desc: 'Besueshmëri, profesionalizëm dhe përkushtim të plotë ndaj cilësisë.' },
+];
+
+const services = [
+  { icon: <FaFire />,  title: 'Ngrohje Qendrore', desc: 'Instalim profesional i sistemeve moderne të ngrohjes qendrore për çdo lloj hapësire.' },
+  { icon: <FaTint />,  title: 'Ujësjellës',        desc: 'Sistem i plotë ujësjellësi me materiale cilësore dhe ekip të specializuar.' },
+  { icon: <FaWind />,  title: 'Sistemi Vakumi',    desc: 'Instalim i sistemeve vakum të fshesave qendrore me teknologji bashkëkohore.' },
+  { icon: <FaTools />, title: 'Mirëmbajtje & Servis', desc: 'Shërbim i shpejtë dhe cilësor pas instalimit, gjithmonë në dispozicion.' },
+];
+
+export default function Ballina() {
+  const [posts, setPosts]     = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage]       = useState(1);
+  const [search, setSearch]   = useState('');
+  const navigate  = useNavigate();
+  const perPage   = 6;
+  const userId    = localStorage.getItem('userId');
+  const token     = localStorage.getItem('token');
+
+  useEffect(() => { loadPosts(); }, []);
 
   async function loadPosts() {
-    const res = await fetch(`${API}/allposts`);
+    const res  = await fetch(`${API}/allposts`);
     const data = await res.json();
     setPosts(data || []);
     setLoading(false);
   }
 
-  const filteredPosts = posts.filter(post => 
-    post.title.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const start = (page - 1) * perPage;
-  const end = start + perPage;
-  const currentPosts = filteredPosts.slice(start, end);
-  const totalPages = Math.ceil(filteredPosts.length / perPage);
-
-  function scrollToProducts() {
-    const element = document.getElementById('products');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+  async function deletePost(postId) {
+    if (!window.confirm('A jeni të sigurt?')) return;
+    const res = await fetch(`${API}/posts/${postId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (res.ok) setPosts(posts.filter(p => p._id !== postId));
+    else alert(data.message || 'Gabim gjatë fshirjes!');
   }
 
-  async function deletePost(postId) {
-    if (!window.confirm('A jeni te sigurt')) {
-      return;
-    }
+  const filtered   = posts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const current    = filtered.slice((page - 1) * perPage, page * perPage);
 
-    try {
-      const res = await fetch(`${API}/posts/${postId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        // Fshi postimin nga lista
-        setPosts(posts.filter(post => post._id !== postId));
-      } else {
-        alert(data.message || 'Gabim gjatë fshirjes!');
-      }
-    } catch (err) {
-      alert('Gabim gjatë fshirjes!');
-    }
+  function scrollTo(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   }
 
   return (
-    <div>
-      <div style={{
-        position: 'relative',
-        width: '100%',
-        minHeight: '90vh',
-        backgroundImage: 'url(/images/b.jpeg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}>
-        <Header textColor="white" onProductsClick={scrollToProducts} />
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 40px' }}>
-          <div style={{
-            padding: '80px 0',
-            maxWidth: '45%'
-          }}>
-           <header className="header-title">
-  <h1>Efi Term</h1>
-  <p>Ujësjellës | Ngrohje Qendrore | Sisteme Vakumi | </p>
-</header>
-           
+    <div className="ab-page">
+
+      {/* ── SLIDER ── */}
+      <div className="ab-slider-wrap">
+        <div className="ab-header-float">
+          <Header textColor="white" onScrollTo={scrollTo} />
+        </div>
+        <Swiper
+          modules={[Autoplay, Pagination, EffectFade]}
+          effect="fade"
+          autoplay={{ delay: 5000, disableOnInteraction: false }}
+          pagination={{ clickable: true }}
+          loop
+          className="ab-swiper"
+        >
+          {slides.map((slide, i) => (
+            <SwiperSlide key={i}>
+              <div className="ab-slide" style={{ backgroundImage: `url('${slide.bg}')` }}>
+                <div className="ab-slide-overlay" />
+                <div className="ab-slide-content">
+                  <span className="ab-badge">{slide.badge}</span>
+                  <h1 className="ab-hero-h1">{slide.title}</h1>
+                  <p className="ab-hero-p">{slide.sub}</p>
+                  <a
+                    href={slide.href}
+                    className="ab-slide-btn"
+                    onClick={e => {
+                      if (slide.href.startsWith('#')) {
+                        e.preventDefault();
+                        scrollTo(slide.href.slice(1));
+                      }
+                    }}
+                  >
+                    {slide.cta} →
+                  </a>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+
+      {/* ── STATS ── */}
+      <div className="ab-stats">
+        {stats.map((s, i) => (
+          <div className="ab-stat" key={i}>
+            <span className="ab-stat-n">{s.number}</span>
+            <span className="ab-stat-l">{s.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* ── RRETH NESH ── */}
+      <section id="about" className="ab-story">
+        <div className="ab-story-wrap">
+          <div className="ab-story-text">
+            <span className="ab-tag">Kompania jonë</span>
+            <h2 className="ab-story-h2">Kush jemi ne?</h2>
+            <p className="ab-story-p">
+              <strong>Efi Term</strong> është një firmë profesionale e fokusuar
+              në sisteme moderne të ngrohjes dhe ftohjes, duke kombinuar
+              teknologjinë, cilësinë dhe korrektësinën.
+            </p>
+            <p className="ab-story-p">
+              Ne punojmë me standarde të larta dhe ofrojmë zgjidhje efikase
+              energjetike për shtëpi dhe biznese, gjithmonë të përshtatura
+              sipas nevojave të klientit.
+            </p>
+            <div className="ab-why-list">
+              {whyUs.map((w, i) => (
+                <div className="ab-why-item" key={i}>
+                  <span className="ab-why-ico">{w.icon}</span>
+                  <span>{w.text}</span>
+                </div>
+              ))}
+            </div>
+            <a href="/contact" className="ab-btn">Na Kontaktoni →</a>
+          </div>
+          <div className="ab-story-img-wrap">
+            <img src="/images/10.jpeg" alt="Projekt Efi Term" className="ab-story-img" />
+            <div className="ab-story-img-badge">Punë e kryer — 2024</div>
           </div>
         </div>
-      </div>
-      
-      <div id="products" style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px 40px', background: '#F5F5F5' }}>
+      </section>
 
-        <div style={{ marginTop: '60px' }}>
-          <div style={{ position: 'relative', marginBottom: '30px' }}>
-            <FaSearch style={{
-              position: 'absolute',
-              left: '15px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#70908B',
-              fontSize: '18px'
-            }} />
+      {/* ── MISIONI · VIZIONI · VLERAT ── */}
+      <section className="ab-mvv">
+        <span className="ab-tag ab-tag--center">Parimet tona</span>
+        <h2 className="ab-mvv-h2">Misioni · Vizioni · Vlerat</h2>
+        <div className="ab-mvv-grid">
+          {values.map((v, i) => (
+            <div className="ab-mvv-card" key={i}>
+              <span className="ab-mvv-ico">{v.icon}</span>
+              <h3 className="ab-mvv-name">{v.title}</h3>
+              <p className="ab-mvv-desc">{v.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SHËRBIMET ── */}
+      <section id="services" className="ab-services">
+        <div className="ab-svc-wrap">
+          <span className="ab-tag ab-tag--center ab-tag--light">Çfarë ofrojmë</span>
+          <h2 className="ab-svc-h2">Shërbimet Tona</h2>
+          <div className="ab-svc-grid">
+            {services.map((s, i) => (
+              <div className="ab-svc-card" key={i}>
+                <span className="ab-svc-ico">{s.icon}</span>
+                <h3 className="ab-svc-name">{s.title}</h3>
+                <p className="ab-svc-desc">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PUNËT TONA ── */}
+      <section id="products" className="works-section">
+        <div className="works-header">
+          <div>
+            <span className="ab-tag ab-tag--light">Galeria jonë</span>
+            <h2 className="works-h2">Punët Tona</h2>
+            <p className="works-sub">Disa nga projektet e realizuara me profesionalizëm dhe cilësi</p>
+          </div>
+          <div className="works-search-box">
+            <FaSearch className="works-search-ico" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Kërko punë..."
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              style={{
-                width: '100%',
-                padding: '12px 15px 12px 45px',
-                border: '1px solid #E5E5E5',
-                borderRadius: '8px',
-                fontSize: '16px',
-                outline: 'none',
-                background: 'white'
-              }}
+              onChange={e => { setSearch(e.target.value); setPage(1); }}
             />
           </div>
+        </div>
 
-      {loading ? (
-            <p style={{ color: '#07484A' }}>Duke ngarkuar...</p>
-          ) : filteredPosts.length === 0 ? (
-            <p style={{ textAlign: 'center', padding: '40px', color: '#07484A' }}>
-              {search ? 'Nuk u gjet produkt me kete titull' : 'Nuk ka produkte akoma'}
-        </p>
-      ) : (
-        <>
-          <div style={{ 
-            display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                gap: '25px'
-          }}>
-            {currentPosts.map(post => {
-              const isOwner = userId && post.userId && (post.userId._id || post.userId).toString() === userId;
+        {loading ? (
+          <p className="works-empty">Duke ngarkuar...</p>
+        ) : filtered.length === 0 ? (
+          <p className="works-empty">{search ? 'Nuk u gjet asnjë punë.' : 'Nuk ka punë të shtuara akoma.'}</p>
+        ) : (
+          <Swiper
+            modules={[Navigation, Pagination]}
+            slidesPerView={1.15}
+            spaceBetween={20}
+            grabCursor
+            navigation
+            pagination={{ clickable: true }}
+            breakpoints={{
+              600:  { slidesPerView: 2,    spaceBetween: 20 },
+              1024: { slidesPerView: 3,    spaceBetween: 24 },
+              1400: { slidesPerView: 3.4,  spaceBetween: 24 },
+            }}
+            className="works-swiper"
+          >
+            {filtered.map(post => {
+              const isOwner = userId && (post.userId?._id || post.userId)?.toString() === userId;
               return (
-                <div key={post._id} style={{ 
-                  border: '1px solid #E5E5E5',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  background: '#fff',
-                  transition: 'transform 0.2s',
-                  cursor: 'pointer',
-                  position: 'relative'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                  {isOwner && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deletePost(post._id);
-                      }}
-                      style={{
-                        position: 'absolute',
-                        top: '10px',
-                        right: '10px',
-                        background: 'rgba(255, 0, 0, 0.8)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: '35px',
-                        height: '35px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 10,
-                        transition: 'background 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 0, 0, 1)'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 0, 0, 0.8)'}
-                      title="Fshi postimin"
-                    >
-                      <FaTrash size={14} />
-                    </button>
-                  )}
-                  {post.image && (
-                    <img 
-                      src={`${API}/uploads/${post.image}`} 
-                      alt={post.title}
-                      style={{ 
-                        width: '100%', 
-                        height: '250px',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  )}
-                  <div style={{ padding: '20px' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: '#07484A' }}>{post.title}</h3>
-                    <p style={{ margin: '0', color: '#70908B', fontSize: '14px' }}>{post.text}</p>
-                    {post.userId && post.userId.username && (
-                      <p style={{ margin: '10px 0 0 0', color: '#999', fontSize: '12px' }}>
-                        Nga: {post.userId.username}
-                      </p>
+                <SwiperSlide key={post._id}>
+                  <div className="work-card">
+                    {isOwner && (
+                      <button className="work-card-del" onClick={() => deletePost(post._id)}>
+                        <FaTrash size={12} />
+                      </button>
                     )}
+                    <div className="work-card-img">
+                      {post.image
+                        ? <img src={`${API}/uploads/${post.image}`} alt={post.title} />
+                        : <div className="work-card-no-img"><FaFire /></div>
+                      }
+                    </div>
+                    <div className="work-card-body">
+                      <h3 className="work-card-title">{post.title}</h3>
+                      {post.text && <p className="work-card-desc">{post.text}</p>}
+                    </div>
                   </div>
-                </div>
+                </SwiperSlide>
               );
             })}
-          </div>
+          </Swiper>
+        )}
+      </section>
 
-          {totalPages > 1 && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '40px' }}>
-                  <button
-                    onClick={() => setPage(1)}
-                    disabled={page === 1}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: page === 1 ? 'not-allowed' : 'pointer',
-                      fontSize: '18px',
-                      color: page === 1 ? '#ccc' : '#07484A',
-                      padding: '5px 10px'
-                    }}
-                  >«</button>
-
-                  {[...Array(totalPages)].map((_, i) => {
-                    const pageNum = i + 1;
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setPage(pageNum)}
-                        style={{
-                          background: page === pageNum ? '#07484A' : 'transparent',
-                          color: page === pageNum ? 'white' : '#70908B',
-                          border: 'none',
-                          borderRadius: '4px',
-                          padding: '8px 12px',
-                          cursor: 'pointer',
-                          fontSize: '16px',
-                          fontWeight: page === pageNum ? 'bold' : 'normal'
-                        }}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    onClick={() => setPage(totalPages)}
-                    disabled={page === totalPages}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: page === totalPages ? 'not-allowed' : 'pointer',
-                      fontSize: '18px',
-                      color: page === totalPages ? '#ccc' : '#07484A',
-                      padding: '5px 10px'
-                    }}
-                  >»</button>
-            </div>
-          )}
-        </>
-      )}
-        </div>
-      </div>
       <Footer />
     </div>
   );
