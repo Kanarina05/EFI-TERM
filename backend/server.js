@@ -16,6 +16,11 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const SECRET = process.env.JWT_SECRET;
 
+
+if (process.env.DNS_SERVERS) {
+  require('dns').setServers(process.env.DNS_SERVERS.split(','));
+}
+
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log('MongoDB u lidh me sukses!'))
   .catch(err => console.error(err));
